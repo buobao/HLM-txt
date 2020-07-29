@@ -1,0 +1,259 @@
+<105>
+class Solution {
+    TreeNode root;
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        if (preorder!=null && preorder.length>0) {
+            root = new TreeNode(preorder[0]);
+        } else {
+            return root;
+        }
+        createTree(root,preorder,inorder);
+        return root;
+    }
+
+    public static void createTree(TreeNode parent,int[] preorder, int[] inorder) {
+        if (preorder == null || preorder.length<=1) {
+            return;
+        }
+        int i=0;
+        for (; i < inorder.length; i++) {
+            if (inorder[i] == parent.val) {
+                break;
+            }
+        }
+
+        //有左子树
+        if (i>0) {
+            parent.left = new TreeNode(preorder[1]);
+            int[] subproleft = new int[i];
+            int[] subinleft = new int[i];
+            for (int k=1,n=0;k<=i;k++,n++) {
+                subproleft[n] = preorder[k];
+            }
+            for (int k=0;k<i;k++) {
+                subinleft[k] = inorder[k];
+            }
+            createTree(parent.left,subproleft,subinleft);
+        }
+
+        //有右子树
+        if (i<preorder.length-1) {
+            parent.right = new TreeNode(preorder[i+1]);
+            int[] subproright = new int[preorder.length-i-1];
+            int[] subinright = new int[preorder.length-i-1];
+            for (int k=i+1,n=0;k<preorder.length;k++,n++) {
+                subproright[n] = preorder[k];
+            }
+            for (int k=i+1,n=0;k<inorder.length;k++,n++) {
+                subinright[n] = inorder[k];
+            }
+            createTree(parent.right,subproright,subinright);
+        }
+    }
+}
+
+
+<106>
+class Solution {
+    TreeNode root;
+    public TreeNode buildTree(int[] inorder, int[] postorder) {
+        if (postorder!=null && postorder.length>0) {
+            root = new TreeNode(postorder[postorder.length-1]);
+        } else {
+            return root;
+        }
+        createTree(root,postorder,inorder);
+        return root;
+    }
+    public static void createTree(TreeNode parent,int[] postorder, int[] inorder) {
+        if (postorder == null || postorder.length<=1) {
+            return;
+        }
+        int i=0; //root在中序中的位置
+        for (; i < inorder.length; i++) {
+            if (inorder[i] == parent.val) {
+                break;
+            }
+        }
+
+        //有左子树
+        if (i>0) {
+            parent.left = new TreeNode(postorder[i-1]);
+            int[] subpostleft = new int[i];
+            int[] subinleft = new int[i];
+            for (int k=0;k<i;k++) {
+                subpostleft[k] = postorder[k];
+                subinleft[k] = inorder[k];
+            }
+            createTree(parent.left,subpostleft,subinleft);
+        }
+
+        //有右子树
+        if (i<postorder.length-1) {
+            parent.right = new TreeNode(postorder[postorder.length-2]);
+            int[] subpostright = new int[postorder.length-i-1];
+            int[] subinright = new int[postorder.length-i-1];
+            for (int k=i,n=0;k<postorder.length-1;k++,n++) {
+                subpostright[n] = postorder[k];
+            }
+            for (int k=i+1,n=0;k<inorder.length;k++,n++) {
+                subinright[n] = inorder[k];
+            }
+            createTree(parent.right,subpostright,subinright);
+        }
+    }
+}
+
+
+<107>
+import java.util.ArrayList;
+class Solution {
+    List<List<Integer>> result;
+    public List<List<Integer>> levelOrderBottom(TreeNode root) {
+        result = new ArrayList();
+        if (root == null) {
+            return result;
+        }
+        toList(0, root);
+        List tmp;
+        for (int i=0;i<result.size()/2;i++) {
+            tmp = result.get(i);
+            result.set(i, result.get(result.size()-1-i));
+            result.set(result.size()-1-i,tmp);
+        }
+        return result;
+    }
+
+    public void toList(int index,TreeNode node) {
+        if (result.size() < index+1) {
+            result.add(new ArrayList<Integer>());
+        }
+        result.get(index).add(node.val);
+        if (node.left!=null) {
+            toList(index+1,node.left);
+        }
+        if (node.right!=null) {
+            toList(index+1,node.right);
+        }
+    }
+}
+
+
+<108>
+class Solution {
+    TreeNode root;
+    public TreeNode sortedArrayToBST(int[] nums) {
+        if (nums==null || nums.length <=0) {
+            return root;
+        }
+        root = new TreeNode(nums[nums.length/2]);
+        createSubTree(root, nums);
+        return root;
+    }
+
+    public void createSubTree(TreeNode root,int[] nums) {
+        int index = nums.length/2;
+        if (index > 0) {
+            root.left = new TreeNode(nums[index/2]);
+            if (index > 1) {
+                int[] subarr = new int[index];
+                for (int i=0;i<index;i++) {
+                    subarr[i] = nums[i];
+                }
+                createSubTree(root.left, subarr);
+            }
+        }
+
+        int rightNodeIndex = (index+1+nums.length)/2;
+        if (rightNodeIndex<nums.length) {
+            root.right = new TreeNode(nums[rightNodeIndex]);
+            if (nums.length-1-index>1) {
+                int[] subarr = new int[nums.length-index-1];
+                for (int i=index+1,n=0;i<nums.length;i++,n++) {
+                    subarr[n] = nums[i];
+                }
+                createSubTree(root.right, subarr);
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+<109>
+        class Solution {
+            TreeNode root;
+            int leftHeight=0;
+            int rightHeight=0;
+            public TreeNode sortedListToBST(ListNode head) {
+                if (head == null) {
+                    return root;
+                }
+                root = new TreeNode(head.val);
+                createSubTree(root, head.next);
+                return root;
+            }
+
+            public void createSubTree(TreeNode tree,ListNode node) {
+                if (node == null) {
+                    return;
+                }
+                tree.right = new TreeNode(node.val);
+                if (tree.left == null) {
+                    rightHeight++;
+                }
+                if (rightHeight-leftHeight>1) {
+                    tree = leftRoatte(null,root);
+                    leftHeight++;
+                    rightHeight--;
+                }
+                createSubTree(tree, node.next);
+            }
+
+            //左旋
+            public TreeNode leftRoatte(TreeNode parent, TreeNode node) {
+                TreeNode right=null;
+                if (parent == null) {
+                    right = node.right;
+                    node.right = right.left;
+                    right.left = node;
+                    root = right;
+                } else {
+                    if (node.right != null) {
+                        right = node.right;
+                        parent.right = right;
+                        node.right = node.right.left;
+                        right.left = node;
+                    } else {
+                        return node;
+                    }
+                }
+
+                if (right!=null && right.right != null) {
+                    return leftRoatte(right,right.right);
+                }
+
+                return right;
+            }
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
